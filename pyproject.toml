@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cognis-admitd"
+version = "0.1.0"
+description = "Kubernetes policy-as-code admission engine — declarative allow/deny/mutate with built-in CIS / NSA-CISA hardening policies"
+authors = [{name = "Cognis Digital", email = "suite@cognis.digital"}]
+license = {text = "LicenseRef-COCL-1.0"}
+requires-python = ">=3.10"
+readme = "README.md"
+keywords = ["kubernetes", "policy-as-code", "admission-controller", "devsecops", "cognis-digital", "cognis-neural-suite"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: Other/Proprietary License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.urls]
+Homepage = "https://cognis.digital"
+Repository = "https://github.com/cognis-digital/admitd"
+
+[project.scripts]
+admitd = "admitd.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["admitd"]

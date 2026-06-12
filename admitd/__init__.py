@@ -1,0 +1,50 @@
+"""admitd — Kubernetes policy-as-code admission engine. Part of the Cognis Neural Suite."""
+
+from admitd.core import (
+    TOOL_NAME,
+    TOOL_VERSION,
+    SEVERITY_ORDER,
+    PolicyError,
+    Violation,
+    Patch,
+    Decision,
+    Policy,
+    policy_from_dict,
+    builtin_policies,
+    all_policies,
+    load_policies_dir,
+    parse_objects,
+    load_manifest_file,
+    evaluate_object,
+    evaluate_text,
+    evaluate_file,
+    decisions_to_dict,
+    to_sarif,
+    admission_response,
+)
+
+__version__ = TOOL_VERSION
+
+__all__ = [
+    "TOOL_NAME",
+    "TOOL_VERSION",
+    "__version__",
+    "SEVERITY_ORDER",
+    "PolicyError",
+    "Violation",
+    "Patch",
+    "Decision",
+    "Policy",
+    "policy_from_dict",
+    "builtin_policies",
+    "all_policies",
+    "load_policies_dir",
+    "parse_objects",
+    "load_manifest_file",
+    "evaluate_object",
+    "evaluate_text",
+    "evaluate_file",
+    "decisions_to_dict",
+    "to_sarif",
+    "admission_response",
+]
