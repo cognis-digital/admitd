@@ -16,6 +16,31 @@
 
 Standard library only. No agent, no CRDs to install, no third-party engine — a single self-hostable Python package.
 
+## Usage — step by step
+
+1. **Install** from source (Python 3.9+):
+   ```bash
+   pip install .
+   ```
+2. **Evaluate** a manifest or AdmissionReview against the built-in policies:
+   ```bash
+   admitd eval deployment.yaml
+   ```
+3. **List** the active policies (built-in + any loaded from a directory):
+   ```bash
+   admitd policies --policies ./policies --format json
+   ```
+4. **Use the output**: emit SARIF or JSON for code-scanning dashboards:
+   ```bash
+   admitd eval manifests/ --policies ./policies --format sarif --out admitd.sarif
+   ```
+5. **Gate in CI / serve as a webhook** — fail on findings, or run the live admission webhook:
+   ```bash
+   admitd eval manifests/ --format json --fail-on high
+   admitd serve --port 8443 --tls-cert tls.crt --tls-key tls.key --mutate
+   ```
+   Also: `admitd draft "<rule>"` (opt-in AI policy draft) and `admitd mcp`.
+
 ## Why another admission tool
 
 - **One artifact, two surfaces.** The same policies gate CI *and* live admission — no drift between "what the linter checks" and "what the cluster enforces."
