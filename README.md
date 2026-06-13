@@ -23,6 +23,16 @@ Standard library only. No agent, no CRDs to install, no third-party engine — a
 - **Hardening out of the box.** Ten built-in policies re-express widely published Kubernetes hardening guidance (CIS Benchmark, NSA/CISA Kubernetes Hardening Guidance).
 - **Stdlib, scriptable, auditable.** No pip dependencies; the whole engine is plain Python you can read.
 
+<!-- cognis:domains:start -->
+## Domains
+
+**Primary domain:** Cyber & Security  ·  **JTF MERIDIAN division:** NULLBYTE · SPECTER
+
+**Topics:** `cognis` `security` `infosec` `cybersecurity` `blue-team` `kubernetes`
+
+Part of the **Cognis Neural Suite** — 300+ source-available tools organized across 12 domains under the JTF MERIDIAN command structure. See the [suite on GitHub](https://github.com/cognis-digital) and [jtf-meridian](https://github.com/cognis-digital/jtf-meridian) for how the pieces fit together.
+<!-- cognis:domains:end -->
+
 ## Install
 
 ```bash
