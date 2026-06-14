@@ -34,3 +34,6 @@ admitd = "admitd.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["admitd"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
