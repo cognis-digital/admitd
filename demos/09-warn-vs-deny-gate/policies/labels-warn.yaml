@@ -1,0 +1,11 @@
+id: ACME-LABELS-WARN
+title: Workloads should declare a cost-center label (advisory)
+severity: low
+control: FinOps governance: cost attribution (advisory, non-blocking)
+action: warn
+match:
+  kinds: [Deployment, StatefulSet, DaemonSet]
+rules:
+  - require_pod_field:
+      path: nodeSelector.cost-center
+      remediation: "Add spec.template.spec.nodeSelector.cost-center so spend can be attributed."

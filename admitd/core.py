@@ -1129,6 +1129,67 @@ def to_sarif(decisions: List[Decision]) -> Dict[str, Any]:
     }
 
 
+def _xml_escape(text: str, attr: bool = False) -> str:
+    out = (str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+    if attr:
+        out = out.replace('"', "&quot;")
+    return out
+
+
+def to_junit(decisions: List[Decision]) -> str:
+    """Render decisions as a JUnit XML report.
+
+    Each evaluated object becomes a ``<testcase>``; every violation on it becomes
+    a nested ``<failure>``. CI systems that consume JUnit XML (GitLab, Jenkins,
+    Azure DevOps, CircleCI, Buildkite) can then surface admitd findings in the
+    same test-report pane as unit tests — one object = one test, each broken
+    control = one failure line. An object with no violations is a passing test.
+
+    The output is deterministic and stdlib-only (no XML library required).
+    """
+    total_failures = sum(len(d.violations) for d in decisions)
+    lines: List[str] = ['<?xml version="1.0" encoding="UTF-8"?>']
+    lines.append(
+        '<testsuites name="{name}" tests="{tests}" failures="{fails}">'.format(
+            name=_xml_escape(f"{TOOL_NAME} admission", attr=True),
+            tests=len(decisions),
+            fails=total_failures,
+        )
+    )
+    lines.append(
+        '  <testsuite name="{name}" tests="{tests}" failures="{fails}">'.format(
+            name=_xml_escape(f"{TOOL_NAME} {TOOL_VERSION}", attr=True),
+            tests=len(decisions),
+            fails=total_failures,
+        )
+    )
+    for d in decisions:
+        classname = _xml_escape(f"{d.namespace or 'cluster'}.{d.kind}", attr=True)
+        casename = _xml_escape(d.name, attr=True)
+        if not d.violations:
+            lines.append(
+                f'    <testcase classname="{classname}" name="{casename}"/>'
+            )
+            continue
+        lines.append(f'    <testcase classname="{classname}" name="{casename}">')
+        for v in d.violations:
+            msg = _xml_escape(f"[{v.policy_id}] {v.title}", attr=True)
+            body_parts = [v.message]
+            if v.control:
+                body_parts.append(f"control: {v.control}")
+            if v.location:
+                body_parts.append(f"at: {v.location}")
+            if v.remediation:
+                body_parts.append(f"fix: {v.remediation}")
+            body = _xml_escape("\n".join(body_parts))
+            ftype = _xml_escape(f"{v.severity}/{v.action}", attr=True)
+            lines.append(f'      <failure message="{msg}" type="{ftype}">{body}</failure>')
+        lines.append("    </testcase>")
+    lines.append("  </testsuite>")
+    lines.append("</testsuites>")
+    return "\n".join(lines)
+
+
 def admission_response(decision: Decision, uid: str = "") -> Dict[str, Any]:
     """Build a Kubernetes AdmissionReview response for one decision.
 

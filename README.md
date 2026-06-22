@@ -142,6 +142,31 @@ These are original re-expressions of public Kubernetes hardening concepts (CIS K
 - **Table** (default) — human-readable per-object verdicts.
 - **JSON** — machine-readable decisions for pipelines.
 - **SARIF** — drops into GitHub code-scanning / IDE problem panes.
+- **JUnit XML** (`--format junit`) — one `<testcase>` per object, one `<failure>`
+  per broken control, so findings surface in the CI test-report pane of GitLab,
+  Jenkins, Azure DevOps, CircleCI, or Buildkite alongside your unit tests:
+  ```bash
+  python -m admitd eval manifests/ --format junit --out admitd-junit.xml
+  ```
+
+## Demo scenarios
+
+The [`demos/`](demos) directory holds runnable, real-use-case scenarios — each a
+manifest (or `AdmissionReview` / custom policy) plus a `SCENARIO.md` explaining
+where the data came from, what to expect, and how to act:
+
+| Demo | Scenario | Shows |
+|------|----------|-------|
+| [`01-basic`](demos/01-basic) | insecure vs. hardened Pod | deny/allow basics, AdmissionReview |
+| [`02-deployment-multidoc`](demos/02-deployment-multidoc) | multi-doc bundle, forgotten sidecar | every container is checked |
+| [`03-cronjob-batch`](demos/03-cronjob-batch) | nightly CronJob | deep nested PodSpec + untagged image |
+| [`04-daemonset-node-agent`](demos/04-daemonset-node-agent) | log collector | legitimate host access → exception workflow |
+| [`05-custom-registry-policy`](demos/05-custom-registry-policy) | trusted-registry allow-list | authoring your own policy |
+| [`06-mutate-autoremediate`](demos/06-mutate-autoremediate) | under-hardened Pod | `mutate` policy → JSONPatch repair |
+| [`07-admissionreview-deny`](demos/07-admissionreview-deny) | node-shell escape attempt | live AdmissionReview, webhook deny |
+| [`08-statefulset-database`](demos/08-statefulset-database) | Postgres StatefulSet | `--fail-on` severity gating |
+| [`09-warn-vs-deny-gate`](demos/09-warn-vs-deny-gate) | FinOps cost-center label | `warn` action vs. the CI gate |
+| [`10-helm-rendered-bundle`](demos/10-helm-rendered-bundle) | `helm template` output | gating a `List` + JUnit report for CI |
 
 ## As an admission webhook
 

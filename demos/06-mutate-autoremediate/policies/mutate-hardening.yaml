@@ -1,0 +1,11 @@
+id: ADMITD-MUTATE-NONROOT
+title: Auto-inject runAsNonRoot and drop ALL capabilities
+severity: high
+control: NSA-CISA K8s Hardening: least privilege (auto-remediation)
+action: mutate
+match:
+  kinds: [Pod, Deployment, DaemonSet, StatefulSet, Job, CronJob]
+rules:
+  - require_field: {path: securityContext.runAsNonRoot, equals: true}
+  - require_field: {path: securityContext.allowPrivilegeEscalation, equals: false}
+  - require_drop_caps: {caps: [ALL]}

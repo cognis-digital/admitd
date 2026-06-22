@@ -1,0 +1,40 @@
+{
+  "apiVersion": "admission.k8s.io/v1",
+  "kind": "AdmissionReview",
+  "request": {
+    "uid": "9f3c1c2a-7b1e-4f0a-9d2e-2c8a4b6f1d77",
+    "kind": {"group": "apps", "version": "v1", "kind": "DaemonSet"},
+    "resource": {"group": "apps", "version": "v1", "resource": "daemonsets"},
+    "namespace": "kube-system",
+    "operation": "CREATE",
+    "userInfo": {"username": "system:serviceaccount:tenant-x:deployer"},
+    "object": {
+      "apiVersion": "apps/v1",
+      "kind": "DaemonSet",
+      "metadata": {"name": "node-shell", "namespace": "kube-system"},
+      "spec": {
+        "selector": {"matchLabels": {"app": "node-shell"}},
+        "template": {
+          "metadata": {"labels": {"app": "node-shell"}},
+          "spec": {
+            "hostPID": true,
+            "hostNetwork": true,
+            "volumes": [
+              {"name": "host", "hostPath": {"path": "/", "type": "Directory"}}
+            ],
+            "containers": [
+              {
+                "name": "shell",
+                "image": "alpine",
+                "securityContext": {
+                  "privileged": true,
+                  "allowPrivilegeEscalation": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

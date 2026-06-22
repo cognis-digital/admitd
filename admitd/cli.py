@@ -17,6 +17,7 @@ from admitd.core import (
     evaluate_file,
     evaluate_object,
     load_manifest_file,
+    to_junit,
     to_sarif,
 )
 
@@ -119,8 +120,9 @@ def _build_parser() -> argparse.ArgumentParser:
     ev.add_argument("--policies", help="Directory or file of extra policies to load.")
     ev.add_argument("--no-builtin", action="store_true",
                     help="Do not load the built-in hardening policy library.")
-    ev.add_argument("--format", choices=("table", "json", "sarif"), default="table",
-                    help="Output format (default: table).")
+    ev.add_argument("--format", choices=("table", "json", "sarif", "junit"), default="table",
+                    help="Output format (default: table). 'junit' emits a JUnit "
+                         "XML report for CI test-report panes.")
     ev.add_argument("--out", help="Write output to this file instead of stdout.")
     ev.add_argument("--fail-on", choices=tuple(SEVERITY_ORDER), default=None,
                     help="Exit non-zero if a violation at/above this severity exists.")
@@ -182,6 +184,8 @@ def _run_eval(args: argparse.Namespace) -> int:
         _emit(json.dumps(decisions_to_dict(decisions), indent=2), args.out)
     elif fmt == "sarif":
         _emit(json.dumps(to_sarif(decisions), indent=2), args.out)
+    elif fmt == "junit":
+        _emit(to_junit(decisions), args.out)
     else:
         _emit(_render_table(decisions), args.out)
 

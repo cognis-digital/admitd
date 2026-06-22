@@ -1,0 +1,13 @@
+id: ACME-REGISTRY-001
+title: Images must come from the approved internal registry
+severity: high
+control: Supply-chain integrity: trusted registry allow-list (org policy)
+action: deny
+match:
+  kinds: [Pod, Deployment, DaemonSet, StatefulSet, Job, CronJob]
+rules:
+  - require_registry:
+      allowed:
+        - registry.internal/
+        - ghcr.io/acme-corp/
+      remediation: "Mirror the image into registry.internal/ or ghcr.io/acme-corp/ and reference it there."

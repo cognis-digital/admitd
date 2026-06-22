@@ -20,6 +20,7 @@ from admitd.core import (
     evaluate_file,
     decisions_to_dict,
     to_sarif,
+    to_junit,
     admission_response,
 )
 
@@ -46,5 +47,6 @@ __all__ = [
     "evaluate_file",
     "decisions_to_dict",
     "to_sarif",
+    "to_junit",
     "admission_response",
 ]
