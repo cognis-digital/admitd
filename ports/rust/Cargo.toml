@@ -1,0 +1,18 @@
+[package]
+name = "admitd"
+version = "0.1.0"
+edition = "2021"
+description = "Rust port of admitd — Kubernetes policy-as-code admission engine (CIS / NSA-CISA hardening). Dependency-free, offline."
+license = "LicenseRef-COCL-1.0"
+
+# Intentionally dependency-free: the engine and a minimal JSON reader are
+# implemented in the standard library only. No network access of any kind.
+[dependencies]
+
+[[bin]]
+name = "admitd"
+path = "src/main.rs"
+
+[lib]
+name = "admitd"
+path = "src/lib.rs"

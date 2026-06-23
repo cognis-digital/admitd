@@ -1,0 +1,22 @@
+{
+  "name": "@cognis-digital/admitd",
+  "version": "0.1.0",
+  "description": "Node port of admitd — Kubernetes policy-as-code admission engine (CIS / NSA-CISA hardening). Zero dependencies, offline.",
+  "type": "module",
+  "license": "SEE LICENSE IN ../../LICENSE",
+  "bin": {
+    "admitd": "src/cli.mjs"
+  },
+  "exports": {
+    ".": "./src/admitd.mjs"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "src"
+  ]
+}

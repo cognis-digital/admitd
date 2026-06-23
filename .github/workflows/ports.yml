@@ -1,0 +1,62 @@
+name: ports
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ports/go
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+      - name: Vet
+        run: go vet ./...
+      - name: Test
+        run: go test -v ./...
+      - name: Build
+        run: go build -o /dev/null .
+      - name: Smoke (eval denies privileged)
+        run: |
+          set -e
+          echo '{"kind":"Pod","metadata":{"name":"p"},"spec":{"containers":[{"name":"c","image":"nginx:latest","securityContext":{"privileged":true}}]}}' \
+            | (go run . eval - || true) | grep -q '"allowed": false'
+
+  node:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ports/node
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Test
+        run: node --test
+      - name: Smoke (eval denies privileged)
+        run: |
+          set -e
+          echo '{"kind":"Pod","metadata":{"name":"p"},"spec":{"containers":[{"name":"c","image":"nginx:latest","securityContext":{"privileged":true}}]}}' \
+            | (node src/cli.mjs eval - || true) | grep -q '"allowed": false'
+
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ports/rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test
+        run: cargo test
+      - name: Build
+        run: cargo build --release
+      - name: Smoke (eval denies privileged)
+        run: |
+          set -e
+          echo '{"kind":"Pod","metadata":{"name":"p"},"spec":{"containers":[{"name":"c","image":"nginx:latest","securityContext":{"privileged":true}}]}}' \
+            | (cargo run --quiet -- eval - || true) | grep -q '"allowed": false'

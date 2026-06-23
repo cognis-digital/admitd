@@ -5,3 +5,10 @@ build/
 .venv/
 .pytest_cache/
 *.sarif
+
+# Language port build artifacts
+ports/rust/target/
+ports/rust/Cargo.lock
+ports/node/node_modules/
+ports/go/admitd
+ports/go/admitd.exe

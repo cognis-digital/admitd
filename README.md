@@ -87,6 +87,41 @@ python -m admitd serve --tls-cert tls.crt --tls-key tls.key --port 8443 --mutate
 python -m admitd mcp
 ```
 
+### Worked example
+
+```text
+$ python -m admitd eval demos/01-basic/insecure-pod.yaml
+admitd eval — 1 object(s)
+====================================================================
+[DENY] Pod/insecure-app (ns: default)
+        source: demos/01-basic/insecure-pod.yaml
+  x [CRIT] ADMITD-PRIV-001  Deny privileged containers
+        container 'app' sets securityContext.privileged=true which is forbidden.
+        control: NSA-CISA K8s Hardening: least privilege / CIS 5.2.1
+        at: /spec/containers/0/securityContext/privileged
+        fix: Remove or unset securityContext.privileged.
+  x [HIGH] ADMITD-HOSTNS-003  Deny host namespaces (network / PID / IPC)
+        pod sets hostNetwork=true which is forbidden.
+        ... (hostPID, hostPath, privilege-escalation, non-root, :latest tag, limits)
+--------------------------------------------------------------------
+SUMMARY: 1 object(s), 1 denied, 8 violation(s).
+RESULT: DENY                                         # process exit code: 1
+```
+
+The same run with `--format json` / `--format sarif` / `--format junit` emits a
+machine-readable report (the JSON shape — `tool`, `version`, `objects_evaluated`,
+`objects_denied`, `total_violations`, `allowed`, `decisions[]` — is identical
+across the Python engine and all language ports).
+
+### Edge / air-gap
+
+`admitd` is **pure standard library with zero pip dependencies** and makes **no
+network calls**. The full policy library is compiled into the binary/package, so
+it runs unchanged on a disconnected build agent, an isolated cluster's webhook
+pod, or an air-gapped review laptop — just `pip install .` (or copy the package)
+and run. Nothing phones home; the only inputs are the manifest you pass and any
+`--policies` directory you point at.
+
 ## The policy language
 
 A policy is a small declarative document (JSON or YAML-subset):
@@ -181,6 +216,34 @@ python -m admitd serve --self-test     # binds localhost, posts a privileged Pod
 ## Opt-in AI policy drafting (off by default)
 
 `admitd draft "deny any pod that mounts the docker socket"` can draft a new policy from a plain-English rule using the Cognis shared AI backend. It is **off by default** and talks only to a **local** fleet endpoint you configure (`COGNIS_AI_BACKEND` / `COGNIS_AI_ENDPOINT`) — nothing leaves your machine. The draft is always validated through the policy parser before it is printed, so a malformed suggestion can never become an executable policy. Review every draft before use.
+
+## Language ports (Go / Node / Rust)
+
+The reference engine is the Python package, but the **validate** surface is also
+shipped as faithful, dependency-free ports under [`ports/`](ports) so the same
+hardening verdicts run wherever your CI or admission tooling already lives — no
+Python required. Each port mirrors `admitd eval <manifest|->` (file **or stdin**)
+and `admitd policies`, implements the identical ten built-in policies and nine
+rule verbs, and emits the same JSON report shape. All ports are offline and
+deterministic (no network access).
+
+| Port | Run tests | Evaluate a manifest |
+|------|-----------|---------------------|
+| [Go](ports/go) | `cd ports/go && go test ./...` | `go run . eval ../../demos/01-basic/admissionreview.json` |
+| [Node / TS](ports/node) | `cd ports/node && node --test` | `node src/cli.mjs eval ../../demos/01-basic/admissionreview.json` |
+| [Rust](ports/rust) | `cd ports/rust && cargo test` | `cargo run -- eval ../../demos/01-basic/admissionreview.json` |
+
+```bash
+# Pipe a manifest straight in (works in every port):
+echo '{"kind":"Pod","metadata":{"name":"p"},"spec":{"containers":[{"name":"c","image":"nginx:latest"}]}}' \
+  | node ports/node/src/cli.mjs eval -        # -> {"allowed": false, ...}, exit 1
+```
+
+The Python reference implementation remains the home of the full surface — the
+HTTPS admission webhook, `mutate` JSONPatch synthesis, SARIF / JUnit emitters,
+the MCP server, and opt-in policy drafting. All three ports are built and tested
+on every push by the [`ports.yml`](.github/workflows/ports.yml) CI workflow. See
+[`ports/README.md`](ports/README.md) for details and the parity matrix.
 
 ## How it fits the Cognis Neural Suite
 
