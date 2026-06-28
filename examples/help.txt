@@ -1,0 +1,20 @@
+$ admitd-emit --help
+
+usage: admitd [-h] [--version] {eval,serve,policies,draft,mcp} ...
+
+Kubernetes policy-as-code admission engine — declarative allow/deny/mutate
+with built-in CIS / NSA-CISA hardening policies.
+
+positional arguments:
+  {eval,serve,policies,draft,mcp}
+    eval                Evaluate manifest(s) / AdmissionReview(s) against
+                        policies.
+    serve               Run an HTTPS AdmissionReview webhook server.
+    policies            List built-in + loaded policies.
+    draft               Draft a new policy from a plain-English rule (opt-in
+                        AI).
+    mcp                 Run as an MCP server (stdio JSON-RPC).
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit

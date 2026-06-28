@@ -1,0 +1,3 @@
+$ admitd-emit --version
+
+admitd 0.1.0

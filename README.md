@@ -16,6 +16,64 @@
 
 Standard library only. No agent, no CRDs to install, no third-party engine — a single self-hostable Python package.
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ admitd-emit --version
+admitd 0.1.0
+```
+
+```console
+$ admitd-emit --help
+usage: admitd [-h] [--version] {eval,serve,policies,draft,mcp} ...
+
+Kubernetes policy-as-code admission engine — declarative allow/deny/mutate
+with built-in CIS / NSA-CISA hardening policies.
+
+positional arguments:
+  {eval,serve,policies,draft,mcp}
+    eval                Evaluate manifest(s) / AdmissionReview(s) against
+                        policies.
+    serve               Run an HTTPS AdmissionReview webhook server.
+    policies            List built-in + loaded policies.
+    draft               Draft a new policy from a plain-English rule (opt-in
+                        AI).
+    mcp                 Run as an MCP server (stdio JSON-RPC).
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+```
+
+> Blocks above are real `admitd` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+"findings": [
+    {
+        "id": "1234567890",
+        "title": "Suspicious Network Activity",
+        "description": "Possible malicious activity detected on network 192.168.1.100",
+        "created_at": "2023-02-20T14:30:00Z"
+    },
+    {
+        "id": "2345678901",
+        "title": "Unusual Login Attempt",
+        "description": "Unauthorized login attempt from IP address 8.8.8.8 on port 22",
+        "created_at": "2023-02-20T14:31:00Z"
+    }
+]
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Usage — step by step
 
 1. **Install** from source (Python 3.9+):
